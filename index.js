@@ -1,26 +1,22 @@
 import express from 'express';
 import cors from 'cors';
-import { connectDB } from './config/db.js';
-import mascotaRoutes from './routes/mascotaRoutes.js';
-import { setupWebSocket } from './sockets/websocket.js';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { setupWebSocket } from './websockets/websocket.js'; // Asegúrate de que la ruta sea correcta
+import mascotaRoutes from './routes/mascotaRoutes.js'; // Importa las rutas
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+const PORT = process.env.PORT || 4500;
 
+app.use(cors());
+app.use(express.json()); // Para poder leer el cuerpo de las solicitudes JSON
+
+// Usar las rutas de mascota
 app.use('/api/mascota', mascotaRoutes);
 
-// Conexión a la base de datos y luego abrir el servidor
-connectDB().then((db) => {
-  setupWebSocket(app, db); // WebSocket
+// Configuración del WebSocket
+setupWebSocket(app);
 
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Servidor corriendo en el puerto ${PORT}`);
-  });
-}).catch((error) => {
-  console.error('No se pudo iniciar el servidor:', error);
+// Aquí va tu conexión a la base de datos
+
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

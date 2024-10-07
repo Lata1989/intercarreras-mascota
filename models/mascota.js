@@ -7,5 +7,10 @@ export const mascota = {
     limpio: 3000,
     diversion: 3000,
     dormido: false,
+    luz: true,
+    temperatura: 30,
+    humedad: 80,
+    fechaNac: Date,
+    fechaMuerte: null,
     vivo: true,
 }
