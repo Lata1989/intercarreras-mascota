@@ -1,22 +1,28 @@
 import express from 'express';
 import cors from 'cors';
-import { setupWebSocket } from './websockets/websocket.js'; // Asegúrate de que la ruta sea correcta
-import mascotaRoutes from './routes/mascotaRoutes.js'; // Importa las rutas
+import { setupWebSocket } from './sockets/websocket.js';
+import mascotaRoutes from './routes/mascotaRoutes.js';
+import { connectDB } from './config/db.js';
 
 const app = express();
 const PORT = process.env.PORT || 4500;
 
 app.use(cors());
-app.use(express.json()); // Para poder leer el cuerpo de las solicitudes JSON
+app.use(express.json());
 
-// Usar las rutas de mascota
+// Usa las rutas de mascota
 app.use('/api/mascota', mascotaRoutes);
 
-// Configuración del WebSocket
-setupWebSocket(app);
+connectDB()
+  .then(() => {
+    // Iniciar el servidor HTTP
+    const server = app.listen(PORT, () => {
+      console.log(`Server corriendo en http://localhost:${PORT}`);
+    });
 
-// Aquí va tu conexión a la base de datos
-
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+    // Configuración del WebSocket, pasando el servidor
+    setupWebSocket(server);
+  })
+  .catch(err => {
+    console.error('Error al conectar a la base de datos:', err);
+  });
