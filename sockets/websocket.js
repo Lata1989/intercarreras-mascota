@@ -93,6 +93,26 @@ export const setupWebSocket = server => {
         { upsert: true }
       );
 
+      // Guardar el estado actualizado en la base de datos historial
+      const mascotaHistorial = getDB().collection('historialmascota');
+
+      // Crear un nuevo documento con el estado actual de la mascota
+      const nuevoHistorial = {
+        felicidad: mascotaState.felicidad,
+        hambre: mascotaState.hambre,
+        suenio: mascotaState.suenio,
+        calor: mascotaState.calor,
+        limpio: mascotaState.limpio,
+        diversion: mascotaState.diversion,
+        dormido: mascotaState.dormido,
+        luz: mascotaState.luz,
+        temperatura: mascotaState.temperatura,
+        humedad: mascotaState.humedad
+      };
+
+      // Insertar el nuevo documento en el historial
+      await mascotaHistorial.insertOne(nuevoHistorial);
+
       // Enviar estado actualizado al cliente
       ws.send(JSON.stringify(mascotaState));
     });
