@@ -86,6 +86,7 @@ export const setupWebSocket = server => {
           break;
         case 'revivir':
           mascotaState.vivo = true;
+          mascotaState = { ...mascotaDefault };
           break;
       }
 
