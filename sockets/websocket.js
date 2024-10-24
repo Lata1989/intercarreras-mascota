@@ -134,6 +134,7 @@ export const setupWebSocket = server => {
             // Actualizar temperatura y humedad en mascotaState
             mascotaState.temperatura = data.temperatura;
             mascotaState.humedad = data.humedad;
+            // mascotaState.luz = data.luz; // No se si lo resolvieron
 
             // Vive o muere la mascota
             if (!mascotaState.vivo) {
@@ -145,6 +146,13 @@ export const setupWebSocket = server => {
             } else {
               mascota.calor = false;
             }
+            
+            if (mascotaState.luz > 30) {
+              mascota.luz = true;
+            } else {
+              mascota.luz = false;
+            }
+
             console.log(
               `Temperatura actualizada: ${data.temperatura}, Humedad actualizada: ${data.humedad}`
             );
