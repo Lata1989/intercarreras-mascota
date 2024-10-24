@@ -57,21 +57,16 @@ export const setupWebSocket = server => {
       // Envia la accion recibida al broker MQTT
       await publicarEnMQTT(data.accion);
 
-      // Vive o muere la mascota
-      if (!mascotaState.vivo) {
-        publicarEnMQTT('morir');
-      }
-      
       // Interacción con la mascota
       switch (data.accion) {
         case 'alimentar':
-          mascotaState.hambre = Math.min(3000, mascotaState.hambre + 1000);
+          mascotaState.hambre = Math.min(200, mascotaState.hambre + 50);
           mascotaState.dormido = false;
           break;
         case 'carinio':
           mascotaState.felicidad = Math.min(
-            3000,
-            mascotaState.felicidad + 1000
+            200,
+            mascotaState.felicidad + 50
           );
           mascotaState.dormido = false;
           break;
@@ -80,13 +75,13 @@ export const setupWebSocket = server => {
           break;
         case 'jugar':
           mascotaState.diversion = Math.min(
-            3000,
-            mascotaState.diversion + 1000
+            200,
+            mascotaState.diversion + 50
           );
           mascotaState.dormido = false;
           break;
         case 'limpiar':
-          mascotaState.limpio = Math.min(3000, mascotaState.limpio + 1000);
+          mascotaState.limpio = Math.min(200, mascotaState.limpio + 50);
           mascotaState.dormido = false;
           break;
         case 'revivir':
@@ -139,6 +134,11 @@ export const setupWebSocket = server => {
             mascotaState.temperatura = data.temperatura;
             mascotaState.humedad = data.humedad;
 
+            // Vive o muere la mascota
+            if (!mascotaState.vivo) {
+              publicarEnMQTT('morir');
+            }
+
             if (mascotaState.temperatura > 30) {
               mascota.calor = true;
             } else {
@@ -147,6 +147,8 @@ export const setupWebSocket = server => {
             console.log(
               `Temperatura actualizada: ${data.temperatura}, Humedad actualizada: ${data.humedad}`
             );
+
+
 
             // Aplicar lógica de tick cuando se recibe un mensaje del sensor
             aplicarLogicaTick();
