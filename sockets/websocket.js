@@ -17,7 +17,7 @@ const aplicarLogicaTick = () => {
   mascotaState.diversion = Math.max(0, mascotaState.diversion - 1);
 
   if (mascotaState.dormido) {
-    mascotaState.suenio = Math.min(3000, mascotaState.suenio + 50);
+    mascotaState.suenio = Math.min(200, mascotaState.suenio + 25);
   } else {
     mascotaState.suenio = Math.max(0, mascotaState.suenio - 1);
   }
@@ -57,16 +57,23 @@ export const setupWebSocket = server => {
       // Envia la accion recibida al broker MQTT
       await publicarEnMQTT(data.accion);
 
+      // Vive o muere la mascota
+      if (!mascotaState.vivo) {
+        publicarEnMQTT('morir');
+      }
+      
       // Interacción con la mascota
       switch (data.accion) {
         case 'alimentar':
           mascotaState.hambre = Math.min(3000, mascotaState.hambre + 1000);
+          mascotaState.dormido = false;
           break;
         case 'carinio':
           mascotaState.felicidad = Math.min(
             3000,
             mascotaState.felicidad + 1000
           );
+          mascotaState.dormido = false;
           break;
         case 'dormir':
           mascotaState.dormido = true;
@@ -76,9 +83,14 @@ export const setupWebSocket = server => {
             3000,
             mascotaState.diversion + 1000
           );
+          mascotaState.dormido = false;
           break;
         case 'limpiar':
           mascotaState.limpio = Math.min(3000, mascotaState.limpio + 1000);
+          mascotaState.dormido = false;
+          break;
+        case 'revivir':
+          mascotaState.vivo = true;
           break;
       }
 
@@ -127,6 +139,11 @@ export const setupWebSocket = server => {
             mascotaState.temperatura = data.temperatura;
             mascotaState.humedad = data.humedad;
 
+            if (mascotaState.temperatura > 30) {
+              mascota.calor = true;
+            } else {
+              mascota.calor = false;
+            }
             console.log(
               `Temperatura actualizada: ${data.temperatura}, Humedad actualizada: ${data.humedad}`
             );
