@@ -107,7 +107,8 @@ export const setupWebSocket = server => {
         dormido: mascotaState.dormido,
         luz: mascotaState.luz,
         temperatura: mascotaState.temperatura,
-        humedad: mascotaState.humedad
+        humedad: mascotaState.humedad,
+        accion: data.accion,
       };
 
       // Insertar el nuevo documento en el historial
