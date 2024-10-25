@@ -10,7 +10,7 @@ dotenv.config();
 let mascotaState = { ...mascotaDefault };
 
 // aplica la logica de cada 'tick' y verifica el estado de la mascota
-const aplicarLogicaTick = () => {
+const aplicarLogicaTick = async () => {
   mascotaState.hambre = Math.max(0, mascotaState.hambre - 1);
   mascotaState.felicidad = Math.max(0, mascotaState.felicidad - 1);
   mascotaState.limpio = Math.max(0, mascotaState.limpio - 1);
@@ -31,6 +31,9 @@ const aplicarLogicaTick = () => {
     mascotaState.limpio <= 0
   ) {
     mascotaState.vivo = false;
+
+    await publicarEnMQTT('morir');
+
     if (!mascotaState.fechaMuerte) {
       mascotaState.fechaMuerte = new Date();
     }
@@ -64,20 +67,14 @@ export const setupWebSocket = server => {
           mascotaState.dormido = false;
           break;
         case 'carinio':
-          mascotaState.felicidad = Math.min(
-            200,
-            mascotaState.felicidad + 50
-          );
+          mascotaState.felicidad = Math.min(200, mascotaState.felicidad + 50);
           mascotaState.dormido = false;
           break;
         case 'dormir':
           mascotaState.dormido = true;
           break;
         case 'jugar':
-          mascotaState.diversion = Math.min(
-            200,
-            mascotaState.diversion + 50
-          );
+          mascotaState.diversion = Math.min(200, mascotaState.diversion + 50);
           mascotaState.dormido = false;
           break;
         case 'limpiar':
@@ -137,17 +134,12 @@ export const setupWebSocket = server => {
             mascotaState.humedad = data.humedad;
             // mascotaState.luz = data.luz; // No se si lo resolvieron
 
-            // Vive o muere la mascota
-            if (!mascotaState.vivo) {
-              publicarEnMQTT('morir');
-            }
-
             if (mascotaState.temperatura > 30) {
               mascota.calor = true;
             } else {
               mascota.calor = false;
             }
-            
+
             if (mascotaState.luz > 30) {
               mascota.luz = true;
             } else {
@@ -157,8 +149,6 @@ export const setupWebSocket = server => {
             console.log(
               `Temperatura actualizada: ${data.temperatura}, Humedad actualizada: ${data.humedad}`
             );
-
-
 
             // Aplicar lógica de tick cuando se recibe un mensaje del sensor
             aplicarLogicaTick();
