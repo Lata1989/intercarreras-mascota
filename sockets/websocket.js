@@ -17,7 +17,7 @@ const aplicarLogicaTick = () => {
   mascotaState.diversion = Math.max(0, mascotaState.diversion - 1);
 
   if (mascotaState.dormido) {
-    mascotaState.suenio = Math.min(3000, mascotaState.suenio + 50);
+    mascotaState.suenio = Math.min(200, mascotaState.suenio + 25);
   } else {
     mascotaState.suenio = Math.max(0, mascotaState.suenio - 1);
   }
@@ -60,25 +60,33 @@ export const setupWebSocket = server => {
       // Interacción con la mascota
       switch (data.accion) {
         case 'alimentar':
-          mascotaState.hambre = Math.min(3000, mascotaState.hambre + 1000);
+          mascotaState.hambre = Math.min(200, mascotaState.hambre + 50);
+          mascotaState.dormido = false;
           break;
         case 'carinio':
           mascotaState.felicidad = Math.min(
-            3000,
-            mascotaState.felicidad + 1000
+            200,
+            mascotaState.felicidad + 50
           );
+          mascotaState.dormido = false;
           break;
         case 'dormir':
           mascotaState.dormido = true;
           break;
         case 'jugar':
           mascotaState.diversion = Math.min(
-            3000,
-            mascotaState.diversion + 1000
+            200,
+            mascotaState.diversion + 50
           );
+          mascotaState.dormido = false;
           break;
         case 'limpiar':
-          mascotaState.limpio = Math.min(3000, mascotaState.limpio + 1000);
+          mascotaState.limpio = Math.min(200, mascotaState.limpio + 50);
+          mascotaState.dormido = false;
+          break;
+        case 'revivir':
+          mascotaState.vivo = true;
+          mascotaState = { ...mascotaDefault };
           break;
       }
 
@@ -127,10 +135,30 @@ export const setupWebSocket = server => {
             // Actualizar temperatura y humedad en mascotaState
             mascotaState.temperatura = data.temperatura;
             mascotaState.humedad = data.humedad;
+            // mascotaState.luz = data.luz; // No se si lo resolvieron
+
+            // Vive o muere la mascota
+            if (!mascotaState.vivo) {
+              publicarEnMQTT('morir');
+            }
+
+            if (mascotaState.temperatura > 30) {
+              mascota.calor = true;
+            } else {
+              mascota.calor = false;
+            }
+            
+            if (mascotaState.luz > 30) {
+              mascota.luz = true;
+            } else {
+              mascota.luz = false;
+            }
 
             console.log(
               `Temperatura actualizada: ${data.temperatura}, Humedad actualizada: ${data.humedad}`
             );
+
+
 
             // Aplicar lógica de tick cuando se recibe un mensaje del sensor
             aplicarLogicaTick();
