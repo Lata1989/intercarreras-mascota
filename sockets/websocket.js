@@ -17,7 +17,7 @@ const aplicarLogicaTick = async () => {
   mascotaState.diversion = Math.max(0, mascotaState.diversion - 1);
 
   if (mascotaState.dormido) {
-    mascotaState.suenio = Math.min(200, mascotaState.suenio + 25);
+    mascotaState.suenio = Math.min(500, mascotaState.suenio + 25);
   } else {
     mascotaState.suenio = Math.max(0, mascotaState.suenio - 1);
   }
@@ -63,22 +63,22 @@ export const setupWebSocket = server => {
       // Interacción con la mascota
       switch (data.accion) {
         case 'alimentar':
-          mascotaState.hambre = Math.min(200, mascotaState.hambre + 50);
+          mascotaState.hambre = Math.min(500, mascotaState.hambre + 50);
           mascotaState.dormido = false;
           break;
         case 'carinio':
-          mascotaState.felicidad = Math.min(200, mascotaState.felicidad + 50);
+          mascotaState.felicidad = Math.min(500, mascotaState.felicidad + 50);
           mascotaState.dormido = false;
           break;
         case 'dormir':
           mascotaState.dormido = true;
           break;
         case 'jugar':
-          mascotaState.diversion = Math.min(200, mascotaState.diversion + 50);
+          mascotaState.diversion = Math.min(500, mascotaState.diversion + 50);
           mascotaState.dormido = false;
           break;
         case 'limpiar':
-          mascotaState.limpio = Math.min(200, mascotaState.limpio + 50);
+          mascotaState.limpio = Math.min(500, mascotaState.limpio + 50);
           mascotaState.dormido = false;
           break;
         case 'revivir':
@@ -132,18 +132,19 @@ export const setupWebSocket = server => {
             // Actualizar temperatura y humedad en mascotaState
             mascotaState.temperatura = data.temperatura;
             mascotaState.humedad = data.humedad;
-            // mascotaState.luz = data.luz; // No se si lo resolvieron
+            mascotaState.luz = data.Luz;
 
-            if (mascotaState.temperatura > 30) {
-              mascota.calor = true;
+            if (mascotaState.temperatura > 35) {
+              mascotaState.calor = true;
+              await publicarEnMQTT('ventilar');
             } else {
-              mascota.calor = false;
+              mascotaState.calor = false;
             }
 
             if (mascotaState.luz > 30) {
-              mascota.luz = true;
+              mascotaState.luz = true;
             } else {
-              mascota.luz = false;
+              mascotaState.luz = false;
             }
 
             console.log(
