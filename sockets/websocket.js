@@ -133,6 +133,7 @@ export const setupWebSocket = server => {
             mascotaState.temperatura = data.temperatura;
             mascotaState.humedad = data.humedad;
             mascotaState.luz = data.Luz;
+            mascotaState.luminosidad = data.Luz;
 
             if (mascotaState.temperatura > 35) {
               mascotaState.calor = true;
@@ -141,14 +142,14 @@ export const setupWebSocket = server => {
               mascotaState.calor = false;
             }
 
-            if (mascotaState.luz > 30) {
+            if (data.Luz > 30) {
               mascotaState.luz = true;
             } else {
               mascotaState.luz = false;
             }
 
             console.log(
-              `Temperatura actualizada: ${data.temperatura}, Humedad actualizada: ${data.humedad}`
+              `Temperatura actualizada: ${data.temperatura}, Humedad actualizada: ${data.humedad}, Luminosidad actualizada: ${data.Luz}`
             );
 
             // Aplicar lógica de tick cuando se recibe un mensaje del sensor

@@ -26,8 +26,9 @@ mqttClient.on('error', err => {
 });
 
 // Para enviar una acción por MQTT a los TSH (topic 'sensor/mascota/accion')
-export const publicarEnMQTT = mensaje => {
+export const publicarEnMQTT = accion => {
   return new Promise((resolve, reject) => {
+    const mensaje = { accion };
     mqttClient.publish(topicAcciones, JSON.stringify(mensaje), err => {
       if (err) {
         console.error('Error publicando Acción en MQTT:', err);

@@ -8,6 +8,7 @@ export const mascota = {
   diversion: 500,
   dormido: false,
   luz: true,
+  luminosidad: null,
   temperatura: null,
   humedad: null,
   fechaNac: Date,
