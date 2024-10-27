@@ -35,7 +35,7 @@ export const publicarEnMQTT = accion => {
         reject(err);
       } else {
         console.log(
-          `Acción '${mensaje}' enviada a '${topicAcciones}' por MQTT`
+          `Acción '${mensaje.accion}' enviada a '${topicAcciones}' por MQTT`
         );
         resolve();
       }

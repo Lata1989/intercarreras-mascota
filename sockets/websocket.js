@@ -17,25 +17,27 @@ const aplicarLogicaTick = async () => {
   mascotaState.diversion = Math.max(0, mascotaState.diversion - 1);
 
   if (mascotaState.dormido) {
-    mascotaState.suenio = Math.min(500, mascotaState.suenio + 25);
+    mascotaState.suenio = Math.min(100, mascotaState.suenio + 25);
   } else {
     mascotaState.suenio = Math.max(0, mascotaState.suenio - 1);
   }
 
   // Verificar si la mascota muere
-  if (
-    mascotaState.hambre <= 0 ||
-    mascotaState.suenio <= 0 ||
-    mascotaState.felicidad <= 0 ||
-    mascotaState.diversion <= 0 ||
-    mascotaState.limpio <= 0
-  ) {
-    mascotaState.vivo = false;
+  if (mascotaState.vivo) {
+    if (
+      mascotaState.hambre <= 0 ||
+      mascotaState.suenio <= 0 ||
+      mascotaState.felicidad <= 0 ||
+      mascotaState.diversion <= 0 ||
+      mascotaState.limpio <= 0
+    ) {
+      mascotaState.vivo = false;
 
-    await publicarEnMQTT('morir');
+      await publicarEnMQTT('morir');
 
-    if (!mascotaState.fechaMuerte) {
-      mascotaState.fechaMuerte = new Date();
+      if (!mascotaState.fechaMuerte) {
+        mascotaState.fechaMuerte = new Date();
+      }
     }
   }
 };
@@ -63,22 +65,22 @@ export const setupWebSocket = server => {
       // Interacción con la mascota
       switch (data.accion) {
         case 'alimentar':
-          mascotaState.hambre = Math.min(500, mascotaState.hambre + 50);
+          mascotaState.hambre = Math.min(100, mascotaState.hambre + 50);
           mascotaState.dormido = false;
           break;
         case 'carinio':
-          mascotaState.felicidad = Math.min(500, mascotaState.felicidad + 50);
+          mascotaState.felicidad = Math.min(100, mascotaState.felicidad + 50);
           mascotaState.dormido = false;
           break;
         case 'dormir':
           mascotaState.dormido = true;
           break;
         case 'jugar':
-          mascotaState.diversion = Math.min(500, mascotaState.diversion + 50);
+          mascotaState.diversion = Math.min(100, mascotaState.diversion + 50);
           mascotaState.dormido = false;
           break;
         case 'limpiar':
-          mascotaState.limpio = Math.min(500, mascotaState.limpio + 50);
+          mascotaState.limpio = Math.min(100, mascotaState.limpio + 50);
           mascotaState.dormido = false;
           break;
         case 'revivir':
